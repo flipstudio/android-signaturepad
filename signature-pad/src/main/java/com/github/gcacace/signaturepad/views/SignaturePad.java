@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
+import android.widget.LinearLayout;
 import com.github.gcacace.signaturepad.R;
 import com.github.gcacace.signaturepad.utils.Bezier;
 import com.github.gcacace.signaturepad.utils.ControlTimedPoints;
@@ -25,7 +26,7 @@ import com.github.gcacace.signaturepad.view.ViewTreeObserverCompat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SignaturePad extends View {
+public class SignaturePad extends LinearLayout {
     //View state
     private List<TimedPoint> mPoints;
     private boolean mIsEmpty;
@@ -56,7 +57,7 @@ public class SignaturePad extends View {
 
     //Default attribute values
     private final int DEFAULT_ATTR_PEN_MIN_WIDTH_PX = 3;
-    private final int DEFAULT_ATTR_PEN_MAX_WIDTH_PX = 7;
+    private final int DEFAULT_ATTR_PEN_MAX_WIDTH_PX = 6;
     private final int DEFAULT_ATTR_PEN_COLOR = Color.BLACK;
     private final float DEFAULT_ATTR_VELOCITY_FILTER_WEIGHT = 0.9f;
     private final boolean DEFAULT_ATTR_CLEAR_ON_DOUBLE_CLICK = false;
@@ -68,10 +69,36 @@ public class SignaturePad extends View {
     public SignaturePad(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        TypedArray a = context.getTheme().obtainStyledAttributes(
-                attrs,
-                R.styleable.SignaturePad,
-                0, 0);
+        setWillNotDraw(false);
+
+        setOrientation(VERTICAL);
+        final float scale = getContext().getResources().getDisplayMetrics().density;
+
+        LinearLayout.LayoutParams upperViewParams = new LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT, 0.25f);
+        final LinearLayout upperLinearLayout = new LinearLayout(context, attrs);
+        upperLinearLayout.setLayoutParams(upperViewParams);
+        addView(upperLinearLayout);
+
+        final LinearLayout.LayoutParams lineViewParams = new LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                (int) (scale + 0.5f));
+        lineViewParams.leftMargin = (int) (scale * 30);
+        lineViewParams.rightMargin = (int) (scale * 30);
+        final LinearLayout lineView = new LinearLayout(context, attrs);
+        lineView.setLayoutParams(lineViewParams);
+        lineView.setBackgroundColor(getResources().getColor(android.R.color.black));
+        addView(lineView);
+
+        final LinearLayout.LayoutParams lowerViewParams = new LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT, 0.75f);
+        final LinearLayout lowerLinearLayout = new LinearLayout(context, attrs);
+        lowerLinearLayout.setLayoutParams(lowerViewParams);
+        addView(lowerLinearLayout);
+
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.SignaturePad, 0, 0);
 
         //Configurable parameters
         try {
